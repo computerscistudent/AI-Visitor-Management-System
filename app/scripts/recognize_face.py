@@ -1,62 +1,29 @@
-from insightface.app import FaceAnalysis
 import cv2
-import numpy as np
-import os
 
-app = FaceAnalysis(name='buffalo_l')
-app.prepare(ctx_id=0)
+from app.services.recognition_service import recognize_faces,load_embeddings
 
-EMBEDDING_DIR = "app/embeddings"
-
-known_embeddings = {}
-
-for file in os.listdir(EMBEDDING_DIR):
-    if file.endswith('.npy'):
-        person_name = file.replace('.npy','')
-        embedding = np.load(os.path.join(EMBEDDING_DIR,file))
-        known_embeddings[person_name] = embedding # type:ignore
-    
-print(known_embeddings.keys())
-
+known_embeddings = load_embeddings()
+if len(known_embeddings) == 0:
+    print("No registered visitors found.")
+    exit()
 camera = cv2.VideoCapture(0)
 
 if not camera.isOpened():
     print("Cannot open webcam")
     exit()
 
-def cosine_similarity(a,b):
-    return np.dot(a,b) ## you can also use np.dot(a,b)/(np.linalg.norm(a)*np.linalg.norm(b)) for normalized cosine similarity if you didnt normalize the embeddings before saving them.
-
 while True:
     success, frames = camera.read()
     if not success:
         break
     
-    faces = app.get(frames)
+    faces = recognize_faces(frames, known_embeddings=known_embeddings, threshold=0.60)
+
     for face in faces:
-        bbox = face.bbox.astype(int)
-        x1,y1,x2,y2 = bbox
-
-        current_embedding = face.embedding
-        current_embedding = current_embedding/np.linalg.norm(current_embedding) 
-
-        best_name = "unknown"
-        best_score = -1
-
-        for person_name, saved_embedding in known_embeddings.items():
-            similarity = cosine_similarity(saved_embedding,current_embedding)
-            # print(f"{person_name}: {similarity:.4f}")
-
-            if similarity > best_score:
-                best_score = similarity
-                best_name = person_name
-            
-        if best_score < 0.60:
-            best_name = "Unknown"
-
+        x1,y1,x2,y2 = face['bbox']
         cv2.rectangle(frames,(x1,y1),(x2,y2),(0,255,0),2)
         cv2.putText(frames,
-            f"{best_name} ({best_score:.2f})",
+            f"{face['name']} ({face['confidence']:.2f})",
             (x1, y1-10),
             cv2.FONT_HERSHEY_SIMPLEX,
             0.8,
@@ -67,8 +34,6 @@ while True:
     key = cv2.waitKey(1)
     if key == ord("q"):
         break
-
-
 
 camera.release()
 cv2.destroyAllWindows()
