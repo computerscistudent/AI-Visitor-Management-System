@@ -10,7 +10,7 @@ def capture_images(person_name, num_images=20):
     person_folder = os.path.join(DATASET_DIR, person_name)
     os.makedirs(person_folder, exist_ok=True)
 
-    camera = cv2.VideoCapture(0)
+    camera = cv2.VideoCapture(0,cv2.CAP_DSHOW)
 
     if not camera.isOpened():
         print("Cannot open webcam.")
@@ -40,17 +40,18 @@ def capture_images(person_name, num_images=20):
         cv2.imshow("Capture Faces",frames)
         key = cv2.waitKey(1)
         if key==ord(" "):
-            if not faces:
+            if len(faces) == 0:
                 print("No faces found!!")
                 continue
-            x,y,w,h = faces[0]
+            largest_face = max(faces, key=lambda f: f[2] * f[3])
+            x,y,w,h = largest_face
             face = frames[y:y+h , x:x+w]
 
-            image_path = os.path.join(person_folder, f"{count+1:03d}.jpg")
+            image_path = os.path.join(person_folder, f"img_{count+1:03d}.jpg")
             cv2.imwrite(image_path,face)
             print(f"Saved {image_path}")
             count += 1
-            if count>num_images:
+            if count>=num_images:
                 break
         elif key == ord('q'):
             break

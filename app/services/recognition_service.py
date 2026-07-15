@@ -52,7 +52,8 @@ def recognize_faces(frame, known_embeddings=None, threshold=0.60):
             best_name = "Unknown"
         
         if best_name!="Unknown":
-            mark_attendence(best_name)
+            #mark_attendence(best_name)
+            pass
 
         results.append({
             "name": best_name,
