@@ -1,57 +1,80 @@
-from flask import Blueprint , render_template
+from flask import Blueprint, render_template, Response
 import cv2
-from app.services.recognition_service import load_embeddings,recognize_faces
 import time
 
-recognize_bp = Blueprint("recognize",__name__)
+from app.services.recognition_service import (
+    load_embeddings,
+    recognize_faces
+)
+
+recognize_bp = Blueprint("recognize", __name__)
+
+# camera = None
+
+def generate_frames():
+    #global camera
+    known_embeddings = load_embeddings()
+    
+    camera = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+    camera.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+    camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+
+    if not camera.isOpened():
+        raise RuntimeError("Could not start camera.")
+    try:
+        frame_count = 0
+        faces = []
+        while True:
+            success, frame = camera.read()
+
+            if not success:
+                time.sleep(0.01)
+                continue
+            frame_count += 1
+            if frame_count%2 == 0:
+                faces = recognize_faces(frame, known_embeddings)
+
+            for face in faces:
+                x1, y1, x2, y2 = face["bbox"]
+
+                cv2.rectangle(frame,(x1, y1),(x2, y2),(46, 204, 113),2)
+
+                cv2.putText(
+                    frame,
+                    f"{face['name']} ({face['confidence']:.2f})",
+                    (x1, y1 - 10),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.8,
+                    (0, 255, 0),
+                    2
+                )
+
+            ret, buffer = cv2.imencode(".jpg", frame,[int(cv2.IMWRITE_JPEG_QUALITY), 80])
+            if not ret:
+                continue
+            frame = buffer.tobytes()
+
+            yield (
+                b"--frame\r\n"
+                b"Content-Type: image/jpeg\r\n\r\n"
+                + frame +
+                b"\r\n"
+            )
+            time.sleep(0.03)
+    finally :
+        if camera is not None:
+            camera.release()
+            camera = None
+
 
 @recognize_bp.route("/recognize")
 def recognize():
-    print("0. Route entered")
-    known_embeddings = load_embeddings()
-    print("1. Embeddings loaded")
-    camera = cv2.VideoCapture(0,cv2.CAP_ANY)
-    print("2. Camera object created")
-    if not camera.isOpened():
-        print("3. Camera failed")
-        return "Cannot open webcam."
-    
-    print("4. Camera opened")
-    while True:
-        print("5A Before camera.read()")
-        success,frame = camera.read()
-        print("5B After camera.read()")
-        if not success:
-            break
-        
-        print("6. Got frame")
-        faces = recognize_faces(frame=frame, known_embeddings=known_embeddings)
-        print("7. Recognition complete")
-
-        print("7.1 Before drawing")
-        for face in faces:
-            x1,y1,x2,y2 = face["bbox"]
-            cv2.rectangle(frame,(x1,y1),(x2,y2),(0,255,0),2)
-            cv2.putText(frame,
-            f"{face['name']} ({face['confidence']:.2f})",
-            (x1, y1-10),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            0.8,
-            (0,255,0),
-            2)
-        print("7.2 Before imshow")
-        cv2.imwrite("temp.jpg", frame)
-
-        print("saved")
-
-        time.sleep(5)
-        break
-    print("9. Releasing camera")
-    camera.release()
-    del camera
-    cv2.destroyWindow("Face Recognition")
-    cv2.waitKey(100)
-    print("10. Rendering HTML")
-
     return render_template("recognize.html")
-    
+
+
+@recognize_bp.route("/video_feed")
+def video_feed():
+    return Response(
+        generate_frames(),
+        mimetype="multipart/x-mixed-replace; boundary=frame"
+    )

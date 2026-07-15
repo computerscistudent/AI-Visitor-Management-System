@@ -24,6 +24,7 @@ def load_embeddings():
 def cosine_similarity(a,b):
     return np.dot(a,b) ## you can also use np.dot(a,b)/(np.linalg.norm(a)*np.linalg.norm(b)) for normalized cosine similarity if you didnt normalize the embeddings before saving them.
 
+marked_today = set()
 def recognize_faces(frame, known_embeddings=None, threshold=0.60):
     if known_embeddings is None:
         known_embeddings = load_embeddings()
@@ -52,8 +53,9 @@ def recognize_faces(frame, known_embeddings=None, threshold=0.60):
             best_name = "Unknown"
         
         if best_name!="Unknown":
-            #mark_attendence(best_name)
-            pass
+            if best_name not in marked_today:
+                mark_attendence(best_name)
+                marked_today.add(best_name)
 
         results.append({
             "name": best_name,
