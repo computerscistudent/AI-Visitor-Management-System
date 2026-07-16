@@ -14,7 +14,7 @@ def register():
         
         captured = capture_images(name)
         if not captured:
-            return "Image capture failed."
+            return "No Image captured."
         
         generated = generate_embeddings(name,overwrite=True)
         if not generated:

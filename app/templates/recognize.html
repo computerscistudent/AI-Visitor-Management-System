@@ -4,34 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recognition</title>
-    <style>
-        body{
-            text-align:center;
-            font-family:Arial;
-            background:#f4f4f4;
-        }
-
-        img{
-            border:4px solid #2ecc71;
-            border-radius:12px;
-        }
-
-        button{
-            padding:12px 25px;
-            font-size:18px;
-            margin-top:20px;
-        }
-    </style>
 </head>
 <body>
-    <h1>Live Recognition</h1>
+    {% extends "base.html" %}
 
-    <img src="{{ url_for('recognize.video_feed') }}" width="900">
+    {% block title %}
+    Recognition
+    {% endblock %}
+
+    {% block content %}
+
+    <h2>Live Recognition</h2>
+
+    <br>
+
+    <img
+        src="{{ url_for('recognize.video_feed') }}"
+        class="camera-feed">
 
     <br><br>
 
-    <a href="/">
-        <button>Home</button>
-    </a>
+    <div class="button-group">
+
+        <a href="/">
+            <button>Home</button>
+        </a>
+
+        <a href="/stop_camera">
+            <button>Stop Camera</button>
+        </a>
+
+    </div>
+
+    {% endblock %}
 </body>
 </html>

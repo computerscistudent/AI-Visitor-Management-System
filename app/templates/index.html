@@ -6,24 +6,34 @@
     <title>AI Visitor Management System</title>
 </head>
 <body>
-    <h1>AI Visitor Management System</h1>
+    {% extends "base.html" %}
 
-    <hr>
+    {% block title %}
+    Home
+    {% endblock %}
 
-    <a href="/register">
-        <button>Register Visitor</button>
-    </a>
+    {% block content %}
 
-    <br><br>
+    <h2>Dashboard</h2>
 
-    <a href="/recognize">
-        <button>Start Recognition</button>
-    </a>
+    <br>
+    <div style="display:flex; gap:30px; flex-wrap:wrap; justify-content: center; margin-top:25px;">
+        <a href="/register">
+        <button class="dashboard-btn">Register Visitor</button>
+        </a>
 
-    <br><br>
+        <br><br>
 
-    <a href="/attendance">
-        <button>View Attendance</button>
-    </a>
+        <a href="/recognize">
+        <button class="dashboard-btn">Start Recognition</button>
+        </a>
+
+        <a href="/attendence">
+        <button class="dashboard-btn">Get Attendance</button>
+        </a>
+
+    </div>
+    
+    {% endblock %}
 </body>
 </html>

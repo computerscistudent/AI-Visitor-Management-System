@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance</title>
+    
+</head>
+<body>
+    {% extends "base.html" %}
+
+    {% block title %}
+    Attendance
+    {% endblock %}
+
+    {% block content %}
+
+    <h2>Attendance Records</h2>
+
+    <table>
+
+    <tr>
+
+    <th>Name</th>
+    <th>Date</th>
+    <th>Time</th>
+
+    </tr>
+
+    {% for row in records %}
+
+    <tr>
+
+    <td>{{ row[0] }}</td>
+    <td>{{ row[1] }}</td>
+    <td>{{ row[2] }}</td>
+
+    </tr>
+
+    {% endfor %}
+
+    </table>
+
+    <br>
+
+    <a href="/">
+    <button>Home</button>
+    </a>
+
+    {% endblock %}
+</body>
+</html>
