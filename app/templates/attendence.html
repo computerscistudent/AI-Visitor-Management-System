@@ -17,7 +17,17 @@
 
     <h2>Attendance Records</h2>
 
-    <table>
+    <input type="text" id="searchInput" placeholder="🔍 Search Visitor..." onkeyup="searchTable()"
+    style="
+        width:300px;
+        padding:10px;
+        margin:20px 0;
+        border-radius:8px;
+        border:1px solid #ccc;
+        font-size:16px;"
+    >
+
+    <table id="attendanceTable">
 
     <tr>
 
@@ -47,6 +57,30 @@
     <button>Home</button>
     </a>
 
+    <script>
+        function searchTable(){
+            let input = document.getElementById("searchInput");
+            let filter = input.value.toUpperCase();
+
+            let table = document.getElementById("attendanceTable");
+            let tr = table.getElementsByTagName("tr");
+
+            for(var i=1; i<tr.length; i++){
+                let td = tr[i].getElementsByTagName("td")[0]
+
+                if(td){
+                    let text = td.textContent || td.innerText
+
+                    if(text.toUpperCase().indexOf(filter)> -1){
+                        tr[i].style.display = "";
+                    }
+                    else{
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+    </script>
     {% endblock %}
 </body>
 </html>

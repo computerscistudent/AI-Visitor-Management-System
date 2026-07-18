@@ -1,7 +1,6 @@
 from flask import Blueprint, render_template, Response
 import cv2
 import time
-
 from app.services.recognition_service import (
     load_embeddings,
     recognize_faces
@@ -39,16 +38,28 @@ def generate_frames():
 
             for face in faces:
                 x1, y1, x2, y2 = face["bbox"]
+                confidence = face['confidence']
+                text = ""
+                if confidence >=0.70:
+                    color = (0, 255, 0)
+                    text = f"{face['name']} ({confidence:.2f})"
+                
+                elif confidence >=0.6:
+                    color = (0, 165, 255)
+                    text = f"{face['name']}  WARNING!! Stay in Frame"
+                else:
+                    color = (0, 0, 255)
+                    text = "Unknown Visitor"
 
-                cv2.rectangle(frame,(x1, y1),(x2, y2),(46, 204, 113),2)
+                cv2.rectangle(frame,(x1, y1),(x2, y2),color,2)
 
                 cv2.putText(
                     frame,
-                    f"{face['name']} ({face['confidence']:.2f})",
+                    text,
                     (x1, y1 - 10),
                     cv2.FONT_HERSHEY_SIMPLEX,
                     0.8,
-                    (0, 255, 0),
+                    color,
                     2
                 )
 
