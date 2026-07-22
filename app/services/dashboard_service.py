@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 from app.config import DATASET_DIR
-from app.services.attendance_service import get_attendence
+from app.services.attendance_service import get_attendance
 
 def total_registered_visitors()-> int:
     if not os.path.exists(DATASET_DIR):
@@ -16,7 +16,7 @@ def total_registered_visitors()-> int:
 
 def attendence_today():
     today = datetime.now().strftime("%Y-%m-%d")
-    records = get_attendence()
+    records = get_attendance()
 
     sum = 0
     for row in records:

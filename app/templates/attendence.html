@@ -17,6 +17,22 @@
 
     <h2>Attendance Records</h2>
 
+    <form method="GET" style="margin-bottom:20px;">
+
+    <select name="sort" onchange="this.form.submit()"
+        style="
+        padding:10px;
+        border-radius:8px;
+        font-size:16px;">
+
+        <option value="newest" {% if sort=="newest" %}selected{% endif %}>Newest First</option>
+        <option value="oldest" {% if sort=="oldest" %}selected{% endif %}>Oldest First</option>
+        <option value="name" {% if sort=="name" %}selected{% endif %}>Name A-Z</option>
+
+    </select>
+
+    </form>
+
     <input type="text" id="searchInput" placeholder="🔍 Search Visitor..." onkeyup="searchTable()"
     style="
         width:300px;
@@ -30,7 +46,7 @@
     <table id="attendanceTable">
 
     <tr>
-
+    <th>Photo</th>
     <th>Name</th>
     <th>Date</th>
     <th>Time</th>
@@ -40,10 +56,17 @@
     {% for row in records %}
 
     <tr>
+    <td>
+        <img src="/{{ row.Photo }}"
+        width="60"
+        height="60"
+        style="border-radius:50%; object-fit:cover;" 
+        alt="No Photo Available">
+    </td>
 
-    <td>{{ row[0] }}</td>
-    <td>{{ row[1] }}</td>
-    <td>{{ row[2] }}</td>
+    <td>{{ row.Name }}</td>
+    <td>{{ row.Date }}</td>
+    <td>{{ row.Time }}</td>
 
     </tr>
 
@@ -53,9 +76,17 @@
 
     <br>
 
-    <a href="/">
-    <button>Home</button>
-    </a>
+    <div style="display:flex; gap:15px; justify-content: center; margin-top:20px;">
+
+        <a href="/">
+            <button>Home</button>
+        </a>
+
+        <a href="/download">
+            <button>⬇ Download CSV</button>
+        </a>
+
+    </div>
 
     <script>
         function searchTable(){
@@ -66,7 +97,7 @@
             let tr = table.getElementsByTagName("tr");
 
             for(var i=1; i<tr.length; i++){
-                let td = tr[i].getElementsByTagName("td")[0]
+                let td = tr[i].getElementsByTagName("td")[1]
 
                 if(td){
                     let text = td.textContent || td.innerText

@@ -6,17 +6,41 @@
     <title>Register Visitor</title>
 </head>
 <body>
-    <form method="POST">
+    {% extends "base.html" %}
+
+    {% block title %}
+    Register Visitor
+    {% endblock %}
+
+    {% block content %}
+    <h2>Register Visitor</h2>
+
+    <form method="POST" style="
+        display: flex; 
+        flex-direction: row; 
+        align-items: center; 
+        justify-content: center;
+        gap: 20px;
+        width: 100%;    
+    ">
     <input
         type="text"
         name="visitor_name"
         placeholder="Enter visitor name"
         required
+        style="width: 100%;
+        max-width: 400px; 
+        padding: 12px;
+        margin: 20px 0 10px 0;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        font-size: 16px;"
     >
 
     <button type="submit">
         Register Visitor
     </button>
-</form>
+    </form>
+    {% endblock %}
 </body>
 </html>

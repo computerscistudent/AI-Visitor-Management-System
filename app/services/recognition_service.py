@@ -2,7 +2,6 @@ from insightface.app import FaceAnalysis
 import numpy as np
 import os
 from app.config import EMBEDDING_DIR
-from app.services.attendance_service import mark_attendence
 
 app = FaceAnalysis(name='buffalo_l')
 app.prepare(ctx_id=0)
@@ -24,7 +23,7 @@ def load_embeddings():
 def cosine_similarity(a,b):
     return np.dot(a,b) ## you can also use np.dot(a,b)/(np.linalg.norm(a)*np.linalg.norm(b)) for normalized cosine similarity if you didnt normalize the embeddings before saving them.
 
-marked_today = set()
+# marked_today = set()
 def recognize_faces(frame, known_embeddings=None, threshold=0.60):
     if known_embeddings is None:
         known_embeddings = load_embeddings()
@@ -52,10 +51,13 @@ def recognize_faces(frame, known_embeddings=None, threshold=0.60):
         if best_score < threshold:
             best_name = "Unknown"
         
-        if best_name!="Unknown":
-            if best_name not in marked_today:
-                mark_attendence(best_name)
-                marked_today.add(best_name)
+        # if best_name!="Unknown":
+        #     mark_attendance(best_name)
+
+        # if best_name!="Unknown":
+        #     if best_name not in marked_today:
+        #         mark_attendance(best_name)
+        #         marked_today.add(best_name)
 
         results.append({
             "name": best_name,

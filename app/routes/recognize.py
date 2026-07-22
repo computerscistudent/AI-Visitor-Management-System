@@ -5,13 +5,18 @@ from app.services.recognition_service import (
     load_embeddings,
     recognize_faces
 )
+from app.services.attendance_service import mark_attendance
+from flask import current_app
 
 recognize_bp = Blueprint("recognize", __name__)
 
 stop_camera = False 
+marked_today = set()
 
 def generate_frames():
     global stop_camera
+    global marked_today
+    marked_today.clear()
     known_embeddings = load_embeddings()
     
     camera = cv2.VideoCapture(0, cv2.CAP_DSHOW)
@@ -37,6 +42,11 @@ def generate_frames():
                 faces = recognize_faces(frame, known_embeddings)
 
             for face in faces:
+                if face["name"] != "Unknown":
+                    if face["name"] not in marked_today:
+                        with current_app.app_context():
+                            mark_attendance(face["name"])
+                        marked_today.add(face["name"])
                 x1, y1, x2, y2 = face["bbox"]
                 confidence = face['confidence']
                 text = ""

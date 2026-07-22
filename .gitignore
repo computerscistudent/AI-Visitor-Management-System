@@ -32,3 +32,7 @@ build/
 
 # --- Local FAISS Vector Caches ---
 faiss_*/
+
+
+eg.txt
+app/config.py
